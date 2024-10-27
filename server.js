@@ -9,6 +9,8 @@ require('./config/database');
 
 // Controllers
 const authController = require('./controllers/auth');
+const recipesController = require('./controllers/recipes.js');
+const ingredientsController = require('./controllers/ingredients.js');
 const isSignedIn = require('./middleware/isSignedIn');
 
 const app = express();
@@ -41,7 +43,10 @@ app.get('/', async (req, res) => {
   res.render('index.ejs');
 });
 
+
 app.use('/auth', authController);
+app.use('/recipes', recipesController);
+app.use('/ingredients', ingredientsController);
 
 // Protected Routes
 app.use(isSignedIn);

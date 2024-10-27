@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit <%= recipe.name %></title>
+</head>
+<body>
+    <h1>Edit a recipe!</h1>
+    <form action="/recipes/<%= recipe._id %>" method="POST">
+
+        <label for="name">name:</label>
+        <input type="text" id="name" name="name" value="<%= recipe.name %>">
+
+        <label for="instructions">instructions:</label>
+        <input type="text" id="instructions" name="instructions" value="<%= recipe.instructions %>">
+
+        <label for="ingredients">Ingredients:</label>
+        <input type="text" id="ingredients" name="ingredients" value="<%= recipe.ingredients %>">
+
+        <button type="submit">Edit recipe</button>
+
+    </form>
+</body>
+</html>
