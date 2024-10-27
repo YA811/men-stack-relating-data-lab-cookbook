@@ -6,6 +6,12 @@ const router = express.Router();
 const User = require('../models/user.js');
 const Ingredient = require('../models/ingredient.js');
 
-// router logic will go here - will be built later on in the lab
+router.get('/', (req,res)=>{
+    res.render('ingredients/index.ejs');
+});
+
+router.post('/', (req,res)=>{
+
+});
 
 module.exports = router;
