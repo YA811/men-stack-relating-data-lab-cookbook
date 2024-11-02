@@ -12,5 +12,11 @@
     <p>name: <%= recipe.name %></p>
     <p>instructions: <%= recipe.instructions %></p>
     <p>ingredients: <%= recipe.ingredients %></p>
+
+    <form action="/recipes/<%= recipe.id %>?_method=DELETE" method="POST">
+        <button type="submit"  >Delete recipe</button>
+    </form>
+    <br>
+    <a href="/recipes/<%= recipe.id %>/edit">Edit recipe</a>
 </body>
 </html>

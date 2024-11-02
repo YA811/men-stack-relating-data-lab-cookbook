@@ -14,19 +14,20 @@ router.get('/', async (req, res) => {
 
   // new route 
   router.get('/new', async (req, res)=>{
+  
     res.render('recipes/new.ejs');
   });
 
   // create
   router.post('/', async (req, res) => {
-    try {
-      const newRecipe = new Recipe(req.body);
-      newRecipe.owner = req.session.user._id
-      await newRecipe.save();
+try{
+  req.body.owner = req.session.user._id;
+      await Recipe.create(req.body);
      res.redirect('/recipes');
-    } catch (error) {
-    res.redirect('/');
-    }
+}
+  catch(error){
+    res.redirect('/')
+  } 
   }); 
 
   //show route
@@ -67,7 +68,7 @@ res.redirect('/')
   router.put('/:recipeId', async (req, res) => {
     try {
       const recipe = await Recipe.findById(req.params.recipeId);
-      await recipe.save(req.body);
+     await recipe.updateOne(req.body);
       res.redirect(`/recipes/${recipe._id}`);
     } catch (error) {
       console.log(error);
