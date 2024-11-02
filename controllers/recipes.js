@@ -5,6 +5,7 @@ const router = express.Router();
 
 const User = require('../models/user.js');
 const Recipe = require('../models/recipe.js');
+const Ingredient = require('../models/ingredient.js');
 
 // router logic will go here - will be built later on in the lab
 
@@ -33,8 +34,15 @@ try{
   //show route
   router.get('/:recipeId', async (req, res) => {
     try{
-        const recipe = await Recipe.findById(req.params.recipeId).populate('owner');
-        res.render('recipes/show.ejs', { recipe })
+      const recipe = await Recipe.findById(req.params.recipeId).populate(
+        'ingredients'
+      );
+      // Get all ingredients to Users can choose to relate them in the view
+      const allIngredients = await Ingredient.find({});
+      res.render('recipes/show.ejs', {
+        recipe: recipe,
+        allIngredients: allIngredients,
+      });
     }
     catch(error){
 console.log(error);
@@ -57,7 +65,11 @@ res.redirect('/')
   router.get('/:recipeId/edit', async (req, res) => {
     try {
       const recipe = await Recipe.findById(req.params.recipeId);
-      res.render('recipes/edit.ejs', { recipe });
+      const allIngredients = await Ingredient.find({});
+      res.render('recipes/edit.ejs', {
+        recipe: recipe,
+        allIngredients: allIngredients,
+      });
     } catch (error) {
       console.log(error);
       res.redirect('/');
@@ -67,14 +79,71 @@ res.redirect('/')
   //update route
   router.put('/:recipeId', async (req, res) => {
     try {
-      const recipe = await Recipe.findById(req.params.recipeId);
-     await recipe.updateOne(req.body);
-      res.redirect(`/recipes/${recipe._id}`);
+     // Find the existing recipe
+		const recipeToUpdate = await Recipe.findById(req.params.recipeId);
+		// Update basic fields
+		recipeToUpdate.name = req.body.name;
+		recipeToUpdate.instructions = req.body.instructions;
+		// Handling ingredients from checkboxes
+		// Ensure req.body.ingredients is an array. If only one ingredient is selected, it might be a string.
+		const selectedIngredients = Array.isArray(req.body.ingredients)
+			? req.body.ingredients
+			: [req.body.ingredients];
+		// Update ingredients
+		recipeToUpdate.ingredients = selectedIngredients;
+		await recipeToUpdate.save();
+		res.redirect(`/recipes/${req.params.recipeId}`);
     } catch (error) {
       console.log(error);
       res.redirect('/');
     }
   });
+
+// Relating Data Routes
+
+// GET - to render an Add Ingredients view
+router.get('/:recipeId/add-ingredients', async (req, res) => {
+	try {
+		const recipe = await Recipe.findById(req.params.recipeId).populate(
+			'ingredients'
+		);
+		const allIngredients = await Ingredient.find({});
+
+		res.render('recipes/add-ingredients.ejs', {
+			recipe: recipe,
+			allIngredients: allIngredients,
+		});
+	} catch (error) {
+		console.log(error);
+		res.redirect('/');
+	}
+});
+
+// POST - to add ingredients to a recipe
+router.post('/:recipeId/ingredients', async (req, res) => {
+	try {
+		const recipe = await Recipe.findById(req.params.recipeId);
+
+		// Ensure req.body.ingredients is an array
+		const ingredientIds = Array.isArray(req.body.ingredients)
+			? req.body.ingredients
+			: [req.body.ingredients];
+
+		// Add selected ingredients to the recipe
+		// Level up - This ensures no duplicates
+		recipe.ingredients = [
+			...new Set([...recipe.ingredients, ...ingredientIds]),
+		];
+		await recipe.save();
+
+		res.redirect(`/recipes/${req.params.recipeId}`);
+	} catch (error) {
+		console.log(error);
+		res.redirect('/');
+	}
+});
+
+
 
 
 module.exports = router;

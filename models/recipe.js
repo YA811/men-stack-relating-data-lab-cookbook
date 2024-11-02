@@ -17,14 +17,15 @@ name:{
   owner:{
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    description: 'A reference to the User model.',
+    ref:"User",
   },
 
-  ingredients:{
-    type: [mongoose.Schema.Types.ObjectId],
+  ingredients:[{
+    type: mongoose.Schema.Types.ObjectId,
     required: false,
-    description: 'An array of references to the Ingredient model.'
+    ref: "Ingredient",
   },
+  ],
 });
 
 module.exports = mongoose.model('Recipe', recipeSchema);
