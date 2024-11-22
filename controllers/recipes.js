@@ -9,9 +9,19 @@ const Ingredient = require('../models/ingredient.js');
 
 // router logic will go here - will be built later on in the lab
 
+// Index Route - Show all recipes of a user
+//Refactor the index route to send all recipes created by a user to the index view:
 router.get('/', async (req, res) => {
-    res.render('recipes/index.ejs');
-  });
+	try {
+		const userRecipes = await Recipe.find({ owner: req.session.user._id }).populate('ingredients');
+		res.render('recipes/index.ejs', {
+			recipes: userRecipes,
+		});
+	} catch (error) {
+		console.log(error);
+		res.redirect('/');
+	}
+});
 
   // new route 
   router.get('/new', async (req, res)=>{
@@ -62,24 +72,26 @@ res.redirect('/')
   });
 
   //edit route
+  // modify your edit route to populate the ingredients:
   router.get('/:recipeId/edit', async (req, res) => {
     try {
-      const recipe = await Recipe.findById(req.params.recipeId);
-      const allIngredients = await Ingredient.find({});
-      res.render('recipes/edit.ejs', {
-        recipe: recipe,
-        allIngredients: allIngredients,
-      });
+        const recipe = await Recipe.findById(req.params.recipeId).populate('ingredients');
+        const allIngredients = await Ingredient.find({});
+        res.render('recipes/edit.ejs', {
+            recipe: recipe,
+            allIngredients: allIngredients,
+        });
     } catch (error) {
-      console.log(error);
-      res.redirect('/');
+        console.log(error);
+        res.redirect('/');
     }
-  });
+});
 
   //update route
   router.put('/:recipeId', async (req, res) => {
     try {
      // Find the existing recipe
+     console.log('Update Data:', req.body); 
 		const recipeToUpdate = await Recipe.findById(req.params.recipeId);
 		// Update basic fields
 		recipeToUpdate.name = req.body.name;

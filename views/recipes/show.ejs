@@ -11,7 +11,10 @@
     <h2>Details</h2>
     <p>name: <%= recipe.name %></p>
     <p>instructions: <%= recipe.instructions %></p>
-    <p>ingredients: <%= recipe.ingredients %></p>
+    <!-- To display the ingredient in your views -->
+    <p>ingredients: <% recipe.ingredients.forEach(ingredient => { %>
+        <%= ingredient.name %>
+    <% }) %></p>
 
     <form action="/recipes/<%= recipe.id %>?_method=DELETE" method="POST">
         <button type="submit"  >Delete recipe</button>
